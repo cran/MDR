@@ -12,8 +12,8 @@ Performs multifactor dimensionality reduction (MDR) to detect potential gene-gen
 \tabular{ll}{
 Package: \tab MDR\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2010-10-07\cr
+Version: \tab 1.1\cr
+Date: \tab 2011-07-16\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 }
@@ -55,4 +55,6 @@ Velez DR et al (2007).  A balanced accuracy function for epistasis modeling in i
 Winham SJ and Motsinger AA (2010).  The effect of retrospective sampling on estimates of prediction error for multifactor dimensionality reduction.  Annals of Human Genetics.
 
 Winham SJ and Motsinger AA (2010).  A comparison of internal validation techniques for multifactor dimensionality reduction.  BMC Bioinformatics.
+
+Edwards TL et al (2010).  A General Framework for Formal Tests of Interaction after Exhaustive Search Methods with Applications to MDR and MDR-PDT.  PLoS One 5(2).
 }

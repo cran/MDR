@@ -389,33 +389,85 @@ est<-mean(boot.error) #estimate is the mean across b samples
 return(list("classification error estimate"=est, "classification accuracy estimate"=100-est))
 } #end function
 
-permute.mdr<-function(accuracy, N.permute, method=c("CV","3WS"), data, cv, K, x=NULL, proportion=NULL, ratio = NULL, equal="HR",genotype=c(0,1,2)){ #function for permutation test
+permute.mdr<-function (accuracy, loci, N.permute, method = c("CV", "3WS"), data, 
+    cv, K, x = NULL, proportion = NULL, ratio = NULL, equal = "HR", 
+    genotype = c(0, 1, 2),LRT=FALSE) 
+{
 
-acc<-rep(0,N.permute) #define vector to store permuted accuracies
+    if (is.null(ratio)) 
+        ratio <- length(which(data[, 1] == 1))/length(which(data[, 
+            1] == 0))
 
-if (method=="CV") {
-for (i in 1:N.permute) { #loop across permuted datasets
-permute<-sample(data[,1],length(data[,1]),replace=FALSE)
-new<-cbind(permute,data[,-1]) #define new permuted dataset
-fit<-mdr.cv(data=new,K,cv,ratio,equal,genotype)
-acc[i]<-fit$'final model accuracy'
-} #end loop
-}#end if
+mdr.lrt<-function(data,loci,x,ratio,equal,genotype) {
+X<-matrix(0,dim(data),length(loci))
+for (i in 1:length(loci)) {
+hr<-mdr( data, loci[i],x, ratio, equal, genotype)
+hr<-hr$'high risk/low risk'
+f<-as.factor(data[,(loci[i]+1)])
+s<-nlevels(f)
+d<-diag(s)[f,]
+X[,i]<-d%*%hr
+}
 
-if (method=="3WS") {
-for (i in 1:N.permute) { #loop across permuted datasets
-permute<-sample(data[,1],length(data[,1]),replace=FALSE)
-new<-cbind(permute,data[,-1]) #define new permuted dataset
-fit<-mdr.3WS(data=new,K,x,proportion,ratio,equal,genotype)
-acc[i]<-fit$'final model accuracy'
-} #end loop
-}#end if
+form1<-paste(paste("X[,",1:length(loci),"]",sep=""),collapse="*")
 
-acc<-sort(acc)
-pval<-sum(acc>accuracy)/N.permute
-return(list("Permutation P-value"=pval,"Permutation Distribution"=acc))
-} #end function
+com<-combn(1:length(loci),length(loci)-1)
+term<-NULL
+for (j in 1:dim(com)[2]) {
+term<-c(term,paste(paste("X[,",com[,j],"]",sep=""),collapse="*"))
+}
 
+form2<-paste(term,collapse="+")
+
+
+lrfit.full<-glm(as.formula(paste("data[,1]~",form1,sep="")),family=binomial(link=logit))
+
+lrfit.reduced<-glm(as.formula(paste("data[,1]~",form2,sep="")),family=binomial(link=logit))
+
+
+x2<-lrfit.reduced$deviance-lrfit.full$deviance
+
+return(x2) }
+
+if (LRT==TRUE) {
+x2<-mdr.lrt(data=data,loci=loci,x=1,ratio=ratio,equal=equal,genotype=genotype)
+chi <- rep(0, N.permute)
+}
+
+    acc <- rep(0, N.permute)
+    
+    if (method == "CV") {
+        for (i in 1:N.permute) {
+            permute <- sample(data[, 1], length(data[, 1]), replace = FALSE)
+            new <- cbind(permute, data[, -1])
+            fit <- mdr.cv(data = new, K, cv, ratio, equal, genotype)
+            acc[i] <- fit$"final model accuracy"
+		if (LRT==TRUE) {
+			chi[i]<-mdr.lrt(data=new,loci=fit$'final model',x=1,ratio=ratio,equal=equal,genotype=genotype)
+		}
+        }
+    }
+    if (method == "3WS") {
+        for (i in 1:N.permute) {
+            permute <- sample(data[, 1], length(data[, 1]), replace = FALSE)
+            new <- cbind(permute, data[, -1])
+            fit <- mdr.3WS(data = new, K, x, proportion, ratio, 
+                equal, genotype)
+            acc[i] <- fit$"final model accuracy"
+		if (LRT==TRUE) {
+			chi[i]<-mdr.lrt(data=new,loci=fit$'final model',x=1,ratio=ratio,equal=equal,genotype=genotype)
+		}
+        }
+    }
+    acc <- sort(acc)
+    pval <- sum(acc > accuracy)/N.permute
+    result <- list(`Permutation P-value` = pval, `Permutation Distribution` = acc)
+if (LRT==TRUE) {
+    chi <- sort(chi)
+    lrt.p <- sum(chi > x2)/N.permute
+    result <- list(`Permutation P-value` = pval, `Permutation Distribution` = acc, 'LRT P-value'=lrt.p, 'LRT Distribution'=chi) }
+    return(result)
+}
 
 ################### define methods for the 'mdr' class
 
