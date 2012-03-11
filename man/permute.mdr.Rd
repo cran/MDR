@@ -6,14 +6,14 @@
 After fitting an object of class \code{'mdr'}, performs a permutation test to assess the statistical significance of the balanced accuracy evaluation measure of the 'best model'.
 }
 \usage{
-permute.mdr(accuracy, loci, N.permute, method = c("CV", "3WS"), data, cv, K, x = NULL, proportion = NULL, ratio = NULL, equal = "HR", genotype = c(0, 1, 2), LRT=FALSE)
+permute.mdr(accuracy, loci, N.permute, method = c("CV", "3WS", "none"), data, cv, K, x = NULL, proportion = NULL, ratio = NULL, equal = "HR", genotype = c(0, 1, 2), LRT=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{accuracy}{the accuracy measure reported from the MDR model fit (after fitting either \code{mdr.cv} or \code{mdr.3WS}) }
-  \item{loci}{the identified loci from the MDR model fit }
+  \item{accuracy}{the accuracy measure reported from the MDR model fit (after fitting \code{mdr.cv}, \code{mdr.3WS}, or \code{mdr}) }
+  \item{loci}{the identified loci from the MDR model fit with \code{mdr.cv} or \code{mdr.3WS}, or prespecified set of loci fit with \code{mdr} }
   \item{N.permute}{the number of data permutations to perform }
-  \item{method}{internal validation method used to fit the model, either "CV" for \code{mdr.cv} or "3WS" for \code{mdr.3WS} }
+  \item{method}{internal validation method used to fit the model: "CV" for \code{mdr.cv}, "3WS" for \code{mdr.3WS}, "none" for \code{mdr} }
   \item{data}{dataset used to fit the MDR model; first column is the binary response vector and subsequent columns are numeric SNP data }
   \item{cv}{if method="CV", the number of cross-validation intervals }
   \item{K}{the maximum size of interaction to consider }
@@ -48,7 +48,14 @@ Edwards TL et al (2010).  A General Framework for Formal Tests of Interaction af
  }
 \author{Stacey Winham}
 
-\seealso{\code{\link{mdr.cv}}, \code{\link{mdr.3WS}} }
+\note{When using \code{permute.mdr} in conjunction with \code{mdr.cv} and \code{mdr.3WS}, the full internal validation and selection procedure is repeated for each permutation. For \code{mdr}, permutation is only consider for the specified variable combination, so internal validation or selection are not performed within each permutation.   
+ } 
+
+\section{Warning}{
+MDR is a combinatorial search approach, so considering high-order interactions and a large number of permutations can be computationally expensive.
+}
+
+\seealso{\code{\link{mdr.cv}}, \code{\link{mdr.3WS}}, \code{\link{mdr}} }
 \examples{
 #load data
 data(mdr1)

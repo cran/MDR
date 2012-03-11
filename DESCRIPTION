@@ -2,8 +2,8 @@ Package: MDR
 Type: Package
 Title: Detect gene-gene interactions using multifactor dimensionality
         reduction
-Version: 1.1
-Date: 2011-07-16
+Version: 1.2
+Date: 2012-03-11
 Author: Stacey Winham
 Maintainer: Stacey Winham <stacey.winham@gmail.com>
 Description: Performs multifactor dimensionality reduction (MDR) to
@@ -12,6 +12,6 @@ Description: Performs multifactor dimensionality reduction (MDR) to
 Depends: lattice
 License: GPL-2
 LazyLoad: yes
-Packaged: 2011-07-08 19:59:48 UTC; sjwood
+Packaged: 2012-03-10 00:09:44 UTC; sjwood
 Repository: CRAN
-Date/Publication: 2011-07-23 13:02:36
+Date/Publication: 2012-03-12 06:05:04
